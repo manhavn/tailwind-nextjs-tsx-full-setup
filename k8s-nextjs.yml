@@ -12,8 +12,8 @@ spec:
   accessModes:
     - ReadWriteMany
   hostPath:
-    path: "/var/www/nextjs-tailwind/static"
-    #path: "/var/tmp/nextjs-tailwind/static"
+    path: "/var/www/nextjs-tailwind/public"
+    #path: "/var/tmp/nextjs-tailwind/public"
   claimRef:
     kind: PersistentVolumeClaim
     namespace: default
@@ -62,10 +62,10 @@ spec:
           ports:
             - containerPort: 3000
           volumeMounts:
-            - mountPath: /nextapp/.next/static
-              name: next-app-static
+            - mountPath: /nextapp/public
+              name: next-app-public
       volumes:
-        - name: next-app-static
+        - name: next-app-public
           persistentVolumeClaim:
             claimName: nextjs-tailwind-claim
       imagePullSecrets:
