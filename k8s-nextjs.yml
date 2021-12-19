@@ -62,7 +62,7 @@ spec:
           ports:
             - containerPort: 3000
           volumeMounts:
-            - mountPath: /nextApp/static
+            - mountPath: /nextapp/static
               name: next-app-static
       volumes:
         - name: next-app-static
