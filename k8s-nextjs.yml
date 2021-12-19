@@ -1,0 +1,84 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nextjs-tailwind-volume
+  labels:
+    type: local
+spec:
+  storageClassName: hostpath
+  capacity:
+    #storage: 40Gi
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/var/www/nextjs-tailwind/static"
+    #path: "/var/tmp/nextjs-tailwind/static"
+  claimRef:
+    kind: PersistentVolumeClaim
+    namespace: default
+    name: nextjs-tailwind-claim
+    apiVersion: v1
+  volumeMode: Filesystem
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nextjs-tailwind-claim
+spec:
+  storageClassName: hostpath
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      #storage: 40Gi
+      storage: 1Gi
+  volumeName: nextjs-tailwind-volume
+  volumeMode: Filesystem
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nextjs-tailwind-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nextjs-tailwind-app
+  template:
+    metadata:
+      labels:
+        app: nextjs-tailwind-app
+    spec:
+      containers:
+        - name: nextjs-tailwind-container
+          image: manhavn/nextjs-tailwind:v12.0.7
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "250m"
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - mountPath: /nextApp/static
+              name: next-app-static
+      volumes:
+        - name: next-app-static
+          persistentVolumeClaim:
+            claimName: nextjs-tailwind-claim
+      imagePullSecrets:
+        - name: manhavn
+
+# cd "$(dirname "$0")"
+# sudo snap install microk8s --classic
+# microk8s start
+# microk8s kubectl apply -f k8s-nextjs.yml
+# microk8s kubectl expose deployment nextjs-tailwind-deployment --type=NodePort --name=nextjs-tailwind-service --external-ip="$(hostname -I | cut -d ' ' -f 1)" --port=3000 --target-port=3000
+# microk8s dashboard-proxy
+
+# microk8s kubectl create secret docker-registry manhavn --docker-server="https://index.docker.io/v2/" --docker-username="manhavn" --docker-password="_______" --docker-email="____@____.___"
+# microk8s kubectl create secret docker-registry <your-secrets-name> --docker-server="<your-registry-server>" --docker-username="<your-name>" --docker-password="<your-password>" --docker-email="<your-email>"
+# microk8s kubectl get secret manhavn --output=yaml
+# microk8s kubectl get secret manhavn --output="jsonpath={.data.\.dockerconfigjson}" | base64 --decode
