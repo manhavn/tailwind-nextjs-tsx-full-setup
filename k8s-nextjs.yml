@@ -78,6 +78,10 @@ spec:
 # microk8s kubectl expose deployment nextjs-tailwind-deployment --type=NodePort --name=nextjs-tailwind-service --external-ip="$(hostname -I | cut -d ' ' -f 1)" --port=3000 --target-port=3000
 # microk8s dashboard-proxy
 
+# MACOS
+# kubectl apply -f k8s-nextjs.yml
+# kubectl expose deployment nextjs-tailwind-deployment --type=NodePort --name=nextjs-tailwind-service --external-ip="$(echo $(ifconfig | grep "inet " | grep -Fv 127.0.0.1 | awk '{print $2}') | awk '{print $1}')" --port=3000 --target-port=3000
+
 # microk8s kubectl create secret docker-registry manhavn --docker-server="https://index.docker.io/v2/" --docker-username="manhavn" --docker-password="_______" --docker-email="____@____.___"
 # microk8s kubectl create secret docker-registry <your-secrets-name> --docker-server="<your-registry-server>" --docker-username="<your-name>" --docker-password="<your-password>" --docker-email="<your-email>"
 # microk8s kubectl get secret manhavn --output=yaml
